@@ -142,6 +142,7 @@ router.get("/search/:search", async (req, res) => {
           { type: {$regex: search, $options: "i" } },
           { streetAddress: {$regex: search, $options: "i" } },
           { aptSuite: {$regex: search, $options: "i" } },
+          { description: {$regex: search, $options: "i" } },
         ]
       }).populate("creator")
     }
