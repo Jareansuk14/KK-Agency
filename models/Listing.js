@@ -79,6 +79,10 @@ const ListingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    statusroom: {
+      type: String,
+      required: true,
+    },
     price: {
       type: String,
       required: true,
