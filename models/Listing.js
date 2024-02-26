@@ -51,7 +51,7 @@ const ListingSchema = new mongoose.Schema(
       required: true,
     },
     area: {
-      type: Number,
+      type: String,
       required: true,
     },
     amenities: {
@@ -74,6 +74,10 @@ const ListingSchema = new mongoose.Schema(
     highlightDesc: {
       type: String,
       required: true
+    },
+    contract: {
+      type: String,
+      required: true,
     },
     price: {
       type: String,

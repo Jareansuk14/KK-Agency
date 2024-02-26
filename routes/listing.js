@@ -39,6 +39,7 @@ router.post("/create", upload.array("listingPhotos"), async (req, res) => {
       description,
       highlight,
       highlightDesc,
+      contract,
       price,
     } = req.body;
 
@@ -70,6 +71,7 @@ router.post("/create", upload.array("listingPhotos"), async (req, res) => {
       description,
       highlight,
       highlightDesc,
+      contract,
       price,
     })
 
