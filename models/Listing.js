@@ -86,6 +86,10 @@ const ListingSchema = new mongoose.Schema(
     price: {
       type: String,
       required: true,
+    },
+    pricerange: {
+      type: String,
+      required: true,
     }
   },
   { timestamps: true}

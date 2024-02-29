@@ -42,6 +42,7 @@ router.post("/create", upload.array("listingPhotos"), async (req, res) => {
       contract,
       statusroom,
       price,
+      pricerange,
     } = req.body;
 
     const listingPhotos = req.files
@@ -75,6 +76,7 @@ router.post("/create", upload.array("listingPhotos"), async (req, res) => {
       contract,
       statusroom,
       price,
+      pricerange,
     })
 
     await newListing.save()
@@ -105,7 +107,31 @@ router.get("/", async (req, res) => {
   }
 })
 
-/* GET LISTINGS BY SEARCH TYPE */
+/* GET LISTINGS BY PRICERANG */
+router.get("/pricerange/:pricerange", async (req, res) => {
+  const { pricerange } = req.params
+
+  try {
+    let listings = []
+
+    if (pricerange === "all") {
+      listings = await Listing.find().populate("creator")
+    } else {
+      listings = await Listing.find({
+        $or: [
+          { pricerange: {$regex: pricerange, $options: "i" } },
+        ]
+      }).populate("creator")
+    }
+
+    res.status(200).json(listings)
+  } catch (err) {
+    res.status(404).json({ message: "Fail to fetch listings", error: err.message })
+    console.log(err)
+  }
+})
+
+/* GET LISTINGS BY TYPE */
 router.get("/type/:type", async (req, res) => {
   const { type } = req.params
 
