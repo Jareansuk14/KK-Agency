@@ -17,10 +17,23 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 
-/* CREATE LISTING FOR SELL */
-router.post("/createforsell", upload.array("listingPhotos"), async (req, res) => {
+const fs = require('fs');
+const https = require('https');
+const express = require('express');
+const app = express();
+
+const options = {
+  key: fs.readFileSync('path/to/server.key'),
+  cert: fs.readFileSync('path/to/server.cert')
+};
+
+// Middleware and routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Example route
+app.post('/createforsell', upload.array("listingPhotos"), async (req, res) => {
   try {
-    /* Take the information from the form */
     const {
       creator,
       category,
@@ -45,13 +58,13 @@ router.post("/createforsell", upload.array("listingPhotos"), async (req, res) =>
       price,
     } = req.body;
 
-    const listingPhotos = req.files
+    const listingPhotos = req.files;
 
     if (!listingPhotos) {
-      return res.status(400).send("No file uploaded.")
+      return res.status(400).send("No file uploaded.");
     }
 
-    const listingPhotoPaths = listingPhotos.map((file) => file.path)
+    const listingPhotoPaths = listingPhotos.map((file) => file.path);
 
     const newListingSell = new ListingSell({
       creator,
@@ -76,16 +89,21 @@ router.post("/createforsell", upload.array("listingPhotos"), async (req, res) =>
       highlightDesc,
       statusroom,
       price,
-    })
+    });
 
-    await newListingSell.save()
+    await newListingSell.save();
 
-    res.status(200).json(newListingSell)
+    res.status(200).json(newListingSell);
   } catch (err) {
-    res.status(409).json({ message: "Fail to create ListingSell", error: err.message })
-    console.log(err)
+    res.status(409).json({ message: "Fail to create ListingSell", error: err.message });
+    console.log(err);
   }
 });
+
+https.createServer(options, app).listen(443, () => {
+  console.log('HTTPS server running on port 443');
+});
+
 
 /* GET lISTINGSELL BY CATEGORY */
 router.get("/", async (req, res) => {
