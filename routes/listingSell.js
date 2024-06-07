@@ -2,7 +2,7 @@ const router = require("express").Router();
 const multer = require("multer");
 
 const ListingSell = require("../models/ListingSell"); 
-const User = require("../models/User");
+const User = require("../models/User")
 
 /* Configuration Multer for File Upload */
 const storage = multer.diskStorage({
@@ -16,10 +16,24 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/* CREATE LISTING FOR SELL */
-router.post("/createforsell", upload.array("listingPhotos"), async (req, res) => {
+
+const fs = require('fs');
+const https = require('https');
+const express = require('express');
+const app = express();
+
+const options = {
+  key: fs.readFileSync('path/to/server.key'),
+  cert: fs.readFileSync('path/to/server.cert')
+};
+
+// Middleware and routes
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Example route
+app.post('/createforsell', upload.array("listingPhotos"), async (req, res) => {
   try {
-    /* Take the information from the form */
     const {
       creator,
       category,
@@ -86,87 +100,92 @@ router.post("/createforsell", upload.array("listingPhotos"), async (req, res) =>
   }
 });
 
-/* GET LISTINGSELL BY CATEGORY */
+https.createServer(options, app).listen(443, () => {
+  console.log('HTTPS server running on port 443');
+});
+
+
+/* GET lISTINGSELL BY CATEGORY */
 router.get("/", async (req, res) => {
-  const qCategorySell = req.query.categorysell;
+  const qCategorySell = req.query.categorysell
 
   try {
-    let listingSell;
+    let listingSell
     if (qCategorySell) {
-      listingSell = await ListingSell.find({ categorysell: qCategorySell }).populate("creator");
+      listingSell = await ListingSell.find({ categorysell: qCategorySell }).populate("creator")
     } else {
-      listingSell = await ListingSell.find().populate("creator");
+      listingSell = await ListingSell.find().populate("creator")
     }
 
-    res.status(200).json(listingSell);
+    res.status(200).json(listingSell)
   } catch (err) {
-    res.status(404).json({ message: "Fail to fetch listings", error: err.message });
-    console.log(err);
+    res.status(404).json({ message: "Fail to fetch listings", error: err.message })
+    console.log(err)
   }
-});
+})
 
 /* GET LISTINGS BY TYPE */
 router.get("/type/:type", async (req, res) => {
-  const { type } = req.params;
+  const { type } = req.params
 
   try {
-    let listingSell = [];
+    let listingSell = []
 
     if (type === "all") {
-      listingSell = await ListingSell.find().populate("creator");
+      listingSell = await ListingSell.find().populate("creator")
     } else {
       listingSell = await ListingSell.find({
         $or: [
-          { type: { $regex: type, $options: "i" } },
-        ],
-      }).populate("creator");
+          { type: {$regex: type, $options: "i" } },
+        ]
+      }).populate("creator")
     }
 
-    res.status(200).json(listingSell);
+    res.status(200).json(listingSell)
   } catch (err) {
-    res.status(404).json({ message: "Fail to fetch listings", error: err.message });
-    console.log(err);
+    res.status(404).json({ message: "Fail to fetch listings", error: err.message })
+    console.log(err)
   }
-});
+})
 
 /* GET LISTINGS BY SEARCH */
 router.get("/search/:search", async (req, res) => {
-  const { search } = req.params;
+  const { search } = req.params
 
   try {
-    let listingSell = [];
+    let listingSell = []
 
     if (search === "all") {
-      listingSell = await ListingSell.find().populate("creator");
+      listingSell = await ListingSell.find().populate("creator")
     } else {
       listingSell = await ListingSell.find({
         $or: [
-          { category: { $regex: search, $options: "i" } },
-          { title: { $regex: search, $options: "i" } },
-          { type: { $regex: search, $options: "i" } },
-          { streetAddress: { $regex: search, $options: "i" } },
-          { aptSuite: { $regex: search, $options: "i" } },
-          { description: { $regex: search, $options: "i" } },
-        ],
-      }).populate("creator");
+          { category: {$regex: search, $options: "i" } },
+          { title: {$regex: search, $options: "i" } },
+          { type: {$regex: search, $options: "i" } },
+          { streetAddress: {$regex: search, $options: "i" } },
+          { aptSuite: {$regex: search, $options: "i" } },
+          { description: {$regex: search, $options: "i" } },
+        ]
+      }).populate("creator")
     }
 
-    res.status(200).json(listingSell);
+    res.status(200).json(listingSell)
   } catch (err) {
-    res.status(404).json({ message: "Fail to fetch listings", error: err.message });
-    console.log(err);
+    res.status(404).json({ message: "Fail to fetch listings", error: err.message })
+    console.log(err)
   }
-});
+})
 
 /* LISTING DETAILS */
 router.get("/:listingId", async (req, res) => {
   try {
-    const { listingId } = req.params;
-    const listingSell = await ListingSell.findById(listingId).populate("creator");
-    res.status(200).json(listingSell); // Changed status code to 200 for a successful GET request
+    const { listingId } = req.params
+    const listingSell = await ListingSell.findById(listingId).populate("creator")
+    res.status(202).json(listingSell)
   } catch (err) {
-    res.status(404).json({ message: "Listing can not be found!", error: err.message });
+    res.status(404).json({ message: "Listing can not found!", error: err.message })
   }
-});
+})
 
-module.exports = router;
+module.exports = router
